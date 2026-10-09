@@ -1,0 +1,107 @@
+{
+  "name": "markdown-editor-desktop",
+  "version": "1.0.7",
+  "description": "面向 AI 文档时代的 Windows Markdown 阅读与编辑工具，支持实时预览、Mermaid、多窗口和导出。",
+  "author": "JLS-superme",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "build:diagram-layout": "node vendor-src/build-layout.cjs",
+    "test:diagram": "electron tests/orthogonal.cjs",
+    "test:windows": "electron tests/new-windows.cjs",
+    "test": "electron tests/regression.cjs",
+    "start": "electron .",
+    "setup-converter": "python -m pip install -r requirements-converter.txt",
+    "pack": "npm run build:diagram-layout && electron-builder --dir",
+    "build:win": "npm run build:diagram-layout && electron-builder --win nsis portable"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "pdf-lib": "^1.17.1",
+    "prettier": "^3.9.6"
+  },
+  "devDependencies": {
+    "@mermaid-js/layout-elk": "0.1.9",
+    "electron": "^31.7.7",
+    "electron-builder": "26.0.12",
+    "esbuild": "0.25.10",
+    "mermaid": "11.12.0"
+  },
+  "build": {
+    "appId": "com.worker.markdowneditor",
+    "productName": "Markdown 编辑器",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "styles.css",
+      "app.js",
+      "markdown-syntax.js",
+      "convert_to_markdown.py",
+      "image/**/*",
+      "node_modules/prettier/standalone.js",
+      "node_modules/prettier/plugins/markdown.js",
+      "vendor/mermaid.min.js",
+      "vendor/mermaid-elk.min.js",
+      "vendor/mermaid-elk.min.js.LEGAL.txt"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "md",
+          "markdown"
+        ],
+        "name": "Markdown 文档",
+        "description": "Markdown 文档",
+        "role": "Editor",
+        "icon": "image/MD-build.ico"
+      }
+    ],
+    "asarUnpack": [
+      "convert_to_markdown.py"
+    ],
+    "win": {
+      "icon": "image/MD-build.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Markdown 编辑器"
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JLS-superme/markdown-reader.git"
+  },
+  "homepage": "https://github.com/JLS-superme/markdown-reader#readme",
+  "bugs": {
+    "url": "https://github.com/JLS-superme/markdown-reader/issues"
+  },
+  "keywords": [
+    "markdown",
+    "markdown-reader",
+    "electron",
+    "mermaid",
+    "windows"
+  ]
+}

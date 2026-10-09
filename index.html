@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Markdown &#38405;&#35835;&#32534;&#36753;&#22120;</title>
+    <link rel="icon" href="./image/MD.ico" />
+    <link rel="stylesheet" href="./styles.css?v=20260909-1" />
+  </head>
+  <body>
+    <div class="app-shell" data-dragging="false">
+      <header class="topbar">
+        <div class="brand">
+          <img class="brand-mark" src="./image/MD.svg" alt="Markdown &#32534;&#36753;&#22120; Logo" />
+          <div>
+            <p class="eyebrow">Markdown &#24037;&#20855;</p>
+            <h1>Markdown &#32534;&#36753;&#22120;</h1>
+          </div>
+        </div>
+
+        <div class="actions">
+          <label id="importButton" class="icon-button" for="fileInput" title="&#23548;&#20837;&#25991;&#20214;">
+            <img class="tool-icon" src="./image/import-file.svg" alt="" />
+          </label>
+          <input id="fileInput" type="file" accept=".md,.markdown,.txt,.docx,.html,.htm,.pdf,text/markdown,text/plain,text/html,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+          <button id="newButton" class="icon-button" type="button" title="&#26032;&#24314;&#25991;&#26723;"><img class="tool-icon" src="./image/new-document.svg" alt="" /></button>
+          <button id="copyButton" class="icon-button" type="button" title="&#22797;&#21046; Markdown"><img class="tool-icon" src="./image/copy-markdown.svg" alt="" /></button>
+          <button id="formatRepairButton" class="icon-button" type="button" title="&#33258;&#21160;&#20462;&#22797; Markdown &#26684;&#24335;"><img class="tool-icon" src="./image/auto-format.svg" alt="" /></button>
+          <button id="saveButton" class="icon-button" type="button" title="&#20445;&#23384; (Ctrl+S)"><img class="tool-icon" src="./image/save.svg" alt="" /></button>
+          <button id="exportButton" class="icon-button" type="button" title="&#23548;&#20986;&#25991;&#20214;"><img class="tool-icon" src="./image/export-file.svg" alt="" /></button>
+        </div>
+      </header>
+
+      <nav class="toolbar" aria-label="&#32534;&#36753;&#24037;&#20855;&#26639;">
+        <button type="button" data-wrap="**" title="&#21152;&#31895;"><img class="tool-icon" src="./image/bold.svg" alt="" /></button>
+        <button type="button" data-wrap="<u>" data-wrap-end="</u>" title="&#19979;&#21010;&#32447;"><img class="tool-icon" src="./image/underline.svg" alt="" /></button>
+        <button type="button" data-wrap="*" title="&#26012;&#20307;"><img class="tool-icon" src="./image/italic.svg" alt="" /></button>
+        <button type="button" data-wrap="~~" title="&#21024;&#38500;&#32447;"><img class="tool-icon" src="./image/strikethrough.svg" alt="" /></button>
+        <details class="toolbar-menu">
+          <summary title="&#26631;&#39064;"><img class="tool-icon" src="./image/heading.svg" alt="" /></summary>
+          <div class="toolbar-menu-list">
+            <button type="button" data-prefix="# " title="&#19968;&#32423;&#26631;&#39064;">&#19968;&#32423;&#26631;&#39064;</button>
+            <button type="button" data-prefix="## " title="&#20108;&#32423;&#26631;&#39064;">&#20108;&#32423;&#26631;&#39064;</button>
+            <button type="button" data-prefix="### " title="&#19977;&#32423;&#26631;&#39064;">&#19977;&#32423;&#26631;&#39064;</button>
+            <button type="button" data-prefix="#### " title="&#22235;&#32423;&#26631;&#39064;">&#22235;&#32423;&#26631;&#39064;</button>
+            <button type="button" data-prefix="##### " title="&#20116;&#32423;&#26631;&#39064;">&#20116;&#32423;&#26631;&#39064;</button>
+            <button type="button" data-prefix="###### " title="&#20845;&#32423;&#26631;&#39064;">&#20845;&#32423;&#26631;&#39064;</button>
+          </div>
+        </details>
+        <button type="button" data-wrap="^" title="&#19978;&#26631;"><img class="tool-icon" src="./image/superscript.svg" alt="" /></button>
+        <button type="button" data-wrap="~" title="&#19979;&#26631;"><img class="tool-icon" src="./image/subscript.svg" alt="" /></button>
+        <button type="button" data-prefix="- " title="&#26080;&#24207;&#21015;&#34920;"><img class="tool-icon" src="./image/unordered-list.svg" alt="" /></button>
+        <button type="button" data-prefix="1. " title="&#26377;&#24207;&#21015;&#34920;"><img class="tool-icon" src="./image/ordered-list.svg" alt="" /></button>
+        <button type="button" data-prefix="- [ ] " title="&#20219;&#21153;&#21015;&#34920;"><img class="tool-icon" src="./image/task-list.svg" alt="" /></button>
+        <button type="button" data-block="table" title="&#34920;&#26684;"><img class="tool-icon" src="./image/table.svg" alt="" /></button>
+        <button type="button" data-prefix="> " title="&#24341;&#29992;"><img class="tool-icon" src="./image/quote.svg" alt="" /></button>
+        <button type="button" data-wrap="`" title="&#34892;&#20869;&#20195;&#30721;"><img class="tool-icon" src="./image/inline-code.svg" alt="" /></button>
+        <button type="button" data-block="code" title="&#20195;&#30721;&#22359;"><img class="tool-icon" src="./image/code-block.svg" alt="" /></button>
+        <button type="button" data-insert="[&#38142;&#25509;&#25991;&#23383;](https://example.com)" title="&#38142;&#25509;"><img class="tool-icon" src="./image/link.svg" alt="" /></button>
+        <button type="button" data-insert="![&#22270;&#29255;&#35828;&#26126;](https://example.com/image.png)" title="&#22270;&#29255;"><img class="tool-icon" src="./image/image.svg" alt="" /></button>
+        <button type="button" data-pick="file" title="&#36873;&#25321;&#24182;&#25554;&#20837;&#26412;&#22320;&#25991;&#20214;&#38142;&#25509;"><img class="tool-icon" src="./image/file.svg" alt="" /></button>
+        <button type="button" data-pick="folder" title="&#36873;&#25321;&#24182;&#25554;&#20837;&#25991;&#20214;&#22841;&#38142;&#25509;"><img class="tool-icon" src="./image/folder.svg" alt="" /></button>
+        <button type="button" data-pick="image" title="&#36873;&#25321;&#24182;&#25554;&#20837;&#26412;&#22320;&#22270;&#29255;"><img class="tool-icon" src="./image/upload-image.svg" alt="" /></button>
+        <button id="findReplaceButton" type="button" title="&#26597;&#25214;&#19982;&#26367;&#25442;" aria-controls="findReplacePanel" aria-expanded="false"><img class="tool-icon" src="./image/search-replace.svg" alt="" /></button>
+        <span class="toolbar-spacer" aria-hidden="true"></span>
+        <label class="sync-scroll-control" title="&#21516;&#27493;&#32534;&#36753;&#21644;&#39044;&#35272;&#30340;&#28378;&#21160;">
+          <span>&#21516;&#27493;&#28378;&#21160;</span>
+          <input id="syncScrollToggle" type="checkbox" checked />
+        </label>
+        <button id="editOnlyButton" class="view-button" type="button" title="&#20165;&#32534;&#36753;"><img class="tool-icon" src="./image/edit-only.svg" alt="" /></button>
+        <button id="previewOnlyButton" class="view-button" type="button" title="&#20165;&#39044;&#35272;"><img class="tool-icon" src="./image/preview-only.svg" alt="" /></button>
+        <button id="fullscreenButton" class="view-button" type="button" title="&#20840;&#23631;"><img id="fullscreenIcon" class="tool-icon" src="./image/fullscreen.svg" alt="" /></button>
+        <input id="linkFileInput" class="asset-input" type="file" />
+        <input id="linkImageInput" class="asset-input" type="file" accept="image/*" />
+        <input id="linkFolderInput" class="asset-input" type="file" webkitdirectory directory multiple />
+      </nav>
+
+      <main class="workspace">
+        <section class="pane editor-pane" aria-label="Markdown &#28304;&#25991;&#26412;">
+          <div class="pane-title">
+            <span id="fileName">&#26410;&#21629;&#21517;.md</span>
+            <span id="status">&#21487;&#23548;&#20837; Markdown&#12289;DOCX&#12289;HTML&#12289;PDF</span>
+          </div>
+          <div id="findReplacePanel" class="find-replace-panel" role="search" hidden>
+            <div class="find-replace-row">
+              <label for="findInput">&#26597;&#25214;</label>
+              <div class="find-input-box">
+                <input id="findInput" type="text" autocomplete="off" spellcheck="false" aria-label="&#26597;&#25214;&#25991;&#26412;" />
+                <span id="findMatchCount" aria-live="polite">0 / 0</span>
+              </div>
+              <button id="findPreviousButton" class="find-icon-button" type="button" title="&#19978;&#19968;&#20010;&#21305;&#37197;" aria-label="&#19978;&#19968;&#20010;&#21305;&#37197;">&#8593;</button>
+              <button id="findNextButton" class="find-icon-button" type="button" title="&#19979;&#19968;&#20010;&#21305;&#37197;" aria-label="&#19979;&#19968;&#20010;&#21305;&#37197;">&#8595;</button>
+              <button id="findCloseButton" class="find-icon-button" type="button" title="&#20851;&#38381;&#26597;&#25214;" aria-label="&#20851;&#38381;&#26597;&#25214;">&#215;</button>
+            </div>
+            <div class="find-replace-row">
+              <label for="replaceInput">&#26367;&#25442;</label>
+              <input id="replaceInput" type="text" autocomplete="off" spellcheck="false" aria-label="&#26367;&#25442;&#20026;" />
+              <button id="replaceButton" class="find-command-button" type="button">&#26367;&#25442;</button>
+              <button id="replaceAllButton" class="find-command-button" type="button">&#20840;&#37096;&#26367;&#25442;</button>
+            </div>
+          </div>
+          <div class="editor-wrap">
+            <pre id="editorHighlight" aria-hidden="true"></pre>
+            <textarea id="editor" spellcheck="false"></textarea>
+          </div>
+        </section>
+
+        <div id="splitter" class="splitter" role="separator" aria-label="&#35843;&#25972;&#32534;&#36753;&#21306;&#21644;&#39044;&#35272;&#21306;&#22823;&#23567;" aria-orientation="vertical"></div>
+
+        <section class="pane preview-pane" aria-label="Markdown &#39044;&#35272;">
+          <div class="pane-title preview-pane-title">
+            <div class="preview-title-group">
+              <span>&#39044;&#35272;</span>
+              <button id="tocToggleButton" class="toc-toggle" type="button" aria-expanded="false" aria-controls="tocPanel" title="&#26597;&#30475;&#25991;&#26723;&#30446;&#24405;">
+                <img src="./image/heading.svg" alt="" />
+                <span>&#30446;&#24405;</span>
+              </button>
+            </div>
+            <span id="wordCount">0 &#23383;</span>
+          </div>
+          <div id="tocPanel" class="toc-panel" hidden>
+            <div class="toc-panel-header">
+              <strong>&#25991;&#26723;&#30446;&#24405;</strong>
+              <button id="tocCloseButton" type="button" title="&#20851;&#38381;&#30446;&#24405;" aria-label="&#20851;&#38381;&#30446;&#24405;">&#215;</button>
+            </div>
+            <nav id="tocList" class="toc-list" aria-label="&#25991;&#26723;&#30446;&#24405;"></nav>
+            <p id="tocEmpty" class="toc-empty" hidden>&#24403;&#21069;&#25991;&#26723;&#27809;&#26377;&#21487;&#26174;&#31034;&#30340;&#26631;&#39064;</p>
+          </div>
+          <article id="preview" class="markdown-preview" tabindex="0">
+            <div id="previewContent" class="markdown-preview-content"></div>
+          </article>
+        </section>
+      </main>
+
+      <div class="drop-hint">
+        <div>
+          <strong>&#26494;&#24320;&#21363;&#21487;&#23548;&#20837;&#25991;&#20214;</strong>
+          <span>&#25903;&#25345; .md&#12289;.markdown&#12289;.txt&#12289;.docx&#12289;.html&#12289;.pdf</span>
+        </div>
+      </div>
+
+      <div id="externalChangeDialog" class="modal-backdrop" hidden>
+        <section class="external-change-panel" role="dialog" aria-modal="true" aria-labelledby="externalChangeTitle" aria-describedby="externalChangeDescription">
+          <p class="external-change-kicker">Markdown &#25991;&#26723;</p>
+          <h2 id="externalChangeTitle">&#25991;&#20214;&#24050;&#34987;&#20462;&#25913;</h2>
+          <p><strong id="externalChangeFileName"></strong> &#25991;&#20214;&#24050;&#22312;&#20854;&#20182;&#20301;&#32622;&#34987;&#20462;&#25913;&#12290;</p>
+          <p id="externalChangeDescription">&#26159;&#21542;&#37325;&#26032;&#21152;&#36733;&#65311;&#37325;&#26032;&#21152;&#36733;&#20250;&#35206;&#30422;&#24403;&#21069;&#32534;&#36753;&#22120;&#20013;&#23578;&#26410;&#20445;&#23384;&#30340;&#20462;&#25913;&#12290;</p>
+          <div class="external-change-actions">
+            <button id="externalChangeCancelButton" class="conflict-button conflict-cancel" type="button">&#21462;&#28040;</button>
+            <button id="externalChangeSaveButton" class="conflict-button conflict-save" type="button">&#21478;&#23384;&#20026;&#21518;&#21152;&#36733;</button>
+            <button id="externalChangeReloadButton" class="conflict-button conflict-reload" type="button">&#30452;&#25509;&#37325;&#36733;</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="saveConfirmDialog" class="modal-backdrop" hidden>
+        <section class="save-confirm-panel" role="dialog" aria-modal="true" aria-labelledby="saveConfirmTitle" aria-describedby="saveConfirmDescription">
+          <p class="save-confirm-kicker">Markdown &#25991;&#26723;</p>
+          <h2 id="saveConfirmTitle">&#26159;&#21542;&#20445;&#23384;&#65311;</h2>
+          <p id="saveConfirmDescription"></p>
+          <div class="save-confirm-actions">
+            <button id="saveCancelButton" class="save-confirm-button" type="button">&#21462;&#28040;</button>
+            <button id="saveConfirmButton" class="save-confirm-button save-confirm-primary" type="button">&#20445;&#23384;</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="exportDialog" class="modal-backdrop" hidden>
+        <section class="export-panel" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+          <button id="exportCloseButton" class="modal-close" type="button" title="&#20851;&#38381;">&#215;</button>
+          <p id="exportTitle" class="export-kicker">&#23548;&#20986;&#35774;&#32622;</p>
+          <label class="export-field" for="exportFormat">
+            <span>&#23548;&#20986;&#26684;&#24335;</span>
+            <select id="exportFormat">
+              <option value="pdf">PDF (.pdf)</option>
+              <option value="png">PNG (.png)</option>
+              <option value="jpg">JPEG (.jpg)</option>
+              <option value="webp">WebP (.webp)</option>
+              <option value="html">HTML (.html)</option>
+              <option value="md">Markdown (.md)</option>
+              <option value="docx">Word (.docx)</option>
+            </select>
+          </label>
+          <button id="exportStartButton" class="export-start" type="button">&#24320;&#22987;&#36716;&#25442;</button>
+          <p id="exportHint" class="export-hint"></p>
+        </section>
+      </div>
+    </div>
+
+    <script src="./node_modules/prettier/standalone.js"></script>
+    <script src="./node_modules/prettier/plugins/markdown.js"></script>
+    <script src="./vendor/mermaid.min.js"></script>
+    <script src="./vendor/mermaid-elk.min.js"></script>
+    <script src="./markdown-syntax.js"></script>
+    <script src="./app.js?v=20260921-2"></script>
+  </body>
+</html>
