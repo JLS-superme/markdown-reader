@@ -18,6 +18,8 @@ const fixtures = ['首个文档.md', '启动队列一.md', '启动队列二.mark
 const files = fixtures.map(name => path.join(output, name));
 const messages = [];
 const errors = [];
+const activations = [];
+const minimizedWindows = new Set();
 let closeResponse = 2;
 
 if (!child) {
@@ -30,7 +32,18 @@ if (!child) {
 const testElectron = {
   ...electron,
   BrowserWindow: new Proxy(BrowserWindow, {
-    construct(Target, args) { return new Target({ ...args[0], show: false }); },
+    construct(Target, args) {
+      const window = new Target({ ...args[0], show: false });
+      // Observe activation without moving test windows onto the user's desktop.
+      window.isMinimized = () => minimizedWindows.has(window.id);
+      for (const method of ['restore', 'show', 'focus']) {
+        window[method] = () => {
+          activations.push({ id: window.id, method });
+          if (method === 'restore') minimizedWindows.delete(window.id);
+        };
+      }
+      return window;
+    },
   }),
   dialog: {
     ...electron.dialog,
@@ -84,6 +97,9 @@ if (!child) {
   // overwrite each other or the original startup file.
   app.emit('open-file', { preventDefault() {} }, files[1]);
   app.emit('second-instance', {}, [files[2]], output);
+  app.emit('open-file', { preventDefault() {} }, files[0]);
+  app.emit('open-file', { preventDefault() {} }, files[1]);
+  app.emit('open-file', { preventDefault() {} }, files[1]);
   app.whenReady().then(async () => {
     const first = await findWindow(files[0]);
     await Promise.all([findWindow(files[1]), findWindow(files[2])]);
@@ -92,13 +108,28 @@ if (!child) {
     const original = await snapshot(first);
     assert.equal(original.dirty, true);
 
+    minimizedWindows.add(first.id);
+    activations.length = 0;
+    await launch(files[0]);
+    await until(() => activations.some(entry => entry.id === first.id && entry.method === 'focus'), 'activate existing window');
+    assert.deepEqual(activations.filter(entry => entry.id === first.id).map(entry => entry.method), ['restore', 'show', 'focus']);
+    assert.equal(first.isAlwaysOnTop(), false, 'Activation must not enable permanent always-on-top');
+    assert.equal(BrowserWindow.getAllWindows().length, 3);
+    assert.deepEqual(await snapshot(first), original, 'Reopening must not reload unsaved edits');
+
+    const alias = process.platform === 'win32' ? files[0].toUpperCase().replace(/\\/g, '/') : files[0];
+    await launch(alias);
+    app.emit('second-instance', {}, [path.basename(files[0])], output);
+    await delay(100);
+    assert.equal(BrowserWindow.getAllWindows().length, 3, 'Equivalent paths reuse the original window');
+
     await launch(files[3]);
     const fourth = await findWindow(files[3]);
     assert.equal(BrowserWindow.getAllWindows().length, 4);
     assert.deepEqual(await snapshot(first), original);
     assert.equal(messages.length, 0, 'Opening another file must not prompt to replace the current document');
 
-    await Promise.all([launch(files[4]), launch(files[5])]);
+    await Promise.all([launch(files[4]), launch(files[4]), launch(files[5])]);
     await Promise.all([findWindow(files[4]), findWindow(files[5])]);
     assert.equal(BrowserWindow.getAllWindows().length, 6);
     assert.deepEqual(await snapshot(first), original);
@@ -116,6 +147,25 @@ if (!child) {
     assert.equal(linked.ok, true);
     await findWindow(files[7]);
     assert.equal(BrowserWindow.getAllWindows().length, 7);
+    const linkedWindow = await findWindow(files[7]);
+    await fourth.webContents.executeJavaScript(`markdownDesktop.openLocalTarget(${JSON.stringify({path:files[7],kind:'file'})})`);
+    await launch(files[7]);
+    assert.equal(BrowserWindow.getAllWindows().length, 7, 'Links and Explorer reuse the same document window');
+    assert.equal((await findWindow(files[7])).id, linkedWindow.id);
+
+    // A window can switch documents via import/new and later acquire a path by saving.
+    await linkedWindow.webContents.executeJavaScript("loadConvertedContent('新建.md', '# 新内容', '新建文档');");
+    await launch(files[7]);
+    const reopenedLink = await findWindow(files[7]);
+    assert.notEqual(reopenedLink.id, linkedWindow.id, 'A cleared document path no longer claims the old file');
+    const imported = path.join(output, '导入的文档.md');
+    fs.writeFileSync(imported, '# 导入内容');
+    await linkedWindow.webContents.executeJavaScript(`loadDesktopFile(${JSON.stringify({name:path.basename(imported),path:imported,content:'# 导入内容',watch:false})})`);
+    await launch(imported);
+    assert.equal((await findWindow(imported)).id, linkedWindow.id, 'Imported documents participate in deduplication');
+    assert.equal(BrowserWindow.getAllWindows().length, 8);
+    linkedWindow.close();
+    await until(() => linkedWindow.isDestroyed(), 'close imported document');
 
     first.close();
     await until(() => messages.length === 1, 'unsaved close prompt');
@@ -125,6 +175,11 @@ if (!child) {
     closeResponse = 1;
     first.close();
     await until(() => first.isDestroyed(), 'close first window');
+    await launch(files[0]);
+    const reopenedFirst = await findWindow(files[0]);
+    assert.notEqual(reopenedFirst.id, first.id, 'Closing a window releases its document identity');
+    reopenedFirst.close();
+    await until(() => reopenedFirst.isDestroyed(), 'close reopened document');
     await launch(files[6]);
     await findWindow(files[6]);
     assert.equal(BrowserWindow.getAllWindows().length, 7, 'Explorer still opens new windows after the first one closes');
@@ -139,6 +194,11 @@ if (!child) {
     }
     const result = { version, packaged, checks: [
       'cold-start file and queued launches stay separate',
+      'duplicate startup and concurrent requests reuse one window',
+      'reopening restores and activates the existing window without reloading edits',
+      'relative paths, separators and Windows case aliases reuse the same window',
+      'links and Explorer share document identity',
+      'new/imported documents update window identity and closed files can reopen',
       'real second process opens a new window',
       'unsaved original content stays untouched',
       'rapid launches keep separate files',

@@ -17,6 +17,9 @@ const pendingOpenFilePaths = [];
 let watchedMarkdownFile = null;
 let watchedMarkdownTimer = null;
 const editorStates = new Map();
+// Reserve a document before its renderer is ready, so simultaneous launches
+// also reuse the window that is still loading it.
+const openingMarkdownPaths = new WeakMap();
 const closePromptWindows = new WeakSet();
 const windowsAllowedToClose = new WeakSet();
 
@@ -109,8 +112,7 @@ function queueFileToOpen(filePath) {
     return;
   }
 
-  // Explorer launches are separate documents, just like Ctrl-clicked MD links.
-  // Give each request its own window and file payload, including rapid launches.
+  // Different documents get separate windows; repeated launches reuse one.
   if ([".md", ".markdown"].includes(path.extname(filePath).toLowerCase())) {
     openLinkedMarkdownInNewWindow(filePath).catch((error) => {
       dialog.showErrorBox("打开文件失败", `${filePath}\n${error.message}`);
@@ -140,6 +142,7 @@ async function openFileInWindow(filePath, ownerWindow) {
     }
   } catch (error) {
     if (ownerWindow && !ownerWindow.isDestroyed()) {
+      openingMarkdownPaths.delete(ownerWindow);
       ownerWindow.webContents.send("import-status", `\u6253\u5f00\u6587\u4ef6\u5931\u8d25\uff1a${error.message}`);
     }
   }
@@ -156,6 +159,34 @@ function stopWatchingMarkdownFile() {
 
 function sameFilePath(left, right) {
   return String(left || "").replace(/\\/g, "/").toLowerCase() === String(right || "").replace(/\\/g, "/").toLowerCase();
+}
+
+function markdownPathKey(filePath) {
+  if (!filePath || !/\.(md|markdown)$/i.test(filePath)) return "";
+  let resolved = path.resolve(filePath);
+  try {
+    resolved = fsSync.realpathSync.native(resolved);
+  } catch (_error) {
+    // Keep the identity of an open document even while an atomic save replaces it.
+  }
+  return process.platform === "win32" ? resolved.toLowerCase() : resolved;
+}
+
+function findMarkdownWindow(key) {
+  if (!key) return null;
+  return BrowserWindow.getAllWindows().find((window) =>
+    !window.isDestroyed() && (
+      openingMarkdownPaths.get(window) === key ||
+      markdownPathKey(editorStates.get(window.webContents.id)?.currentPath) === key
+    )
+  );
+}
+
+function activateDocumentWindow(window) {
+  if (window.isMinimized()) window.restore();
+  window.show();
+  window.focus();
+  return window;
 }
 
 function watchMarkdownFile(filePath) {
@@ -235,6 +266,8 @@ function createWindow(filePath = null) {
 
   mainWindow = window;
   if (filePath) {
+    const key = markdownPathKey(filePath);
+    if (key) openingMarkdownPaths.set(window, key);
     window.webContents.once("did-finish-load", () => openFileInWindow(filePath, window));
   }
   window.loadFile(path.join(__dirname, "index.html"));
@@ -255,7 +288,13 @@ function createWindow(filePath = null) {
 
 async function openLinkedMarkdownInNewWindow(filePath) {
   const normalizedPath = path.resolve(filePath);
+  const key = markdownPathKey(normalizedPath);
+  const existing = findMarkdownWindow(key);
+  if (existing) return activateDocumentWindow(existing);
   const content = await fs.readFile(normalizedPath, "utf8");
+  // Another request may have created the window while this file was being read.
+  const opening = findMarkdownWindow(key);
+  if (opening) return activateDocumentWindow(opening);
   const file = { ok: true, ...fileInfo(normalizedPath, { content }), watch: false };
   const linkedWindow = new BrowserWindow({
     width: DEFAULT_WINDOW_STATE.width,
@@ -273,10 +312,17 @@ async function openLinkedMarkdownInNewWindow(filePath) {
     },
   });
 
+  openingMarkdownPaths.set(linkedWindow, key);
   linkedWindow.webContents.once("did-finish-load", () => linkedWindow.webContents.send("open-file", file));
   linkedWindow.setMenuBarVisibility(false);
   attachWindowCloseHandler(linkedWindow, false);
-  await linkedWindow.loadFile(path.join(__dirname, "index.html"));
+  try {
+    await linkedWindow.loadFile(path.join(__dirname, "index.html"));
+  } catch (error) {
+    openingMarkdownPaths.delete(linkedWindow);
+    if (!linkedWindow.isDestroyed()) linkedWindow.destroy();
+    throw error;
+  }
   return linkedWindow;
 }
 
@@ -298,7 +344,10 @@ function attachWindowCloseHandler(window, persistWindowState) {
     event.preventDefault();
     promptToSaveBeforeClose(window, webContentsId);
   });
-  window.on("closed", () => editorStates.delete(webContentsId));
+  window.on("closed", () => {
+    editorStates.delete(webContentsId);
+    openingMarkdownPaths.delete(window);
+  });
 }
 
 async function promptToSaveBeforeClose(window, webContentsId) {
@@ -403,6 +452,10 @@ app.on("activate", () => {
 ipcMain.handle("set-current-document", (_event, filePath) => watchMarkdownFile(String(filePath || "")));
 
 ipcMain.on("update-editor-state", (event, state) => {
+  const ownerWindow = BrowserWindow.fromWebContents(event.sender);
+  if (ownerWindow && openingMarkdownPaths.get(ownerWindow) === markdownPathKey(state?.currentPath)) {
+    openingMarkdownPaths.delete(ownerWindow);
+  }
   editorStates.set(event.sender.id, {
     dirty: state?.dirty === true,
     content: String(state?.content || ""),

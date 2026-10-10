@@ -4,7 +4,7 @@
 
 一个面向 Windows 的 Markdown 桌面阅读与编辑工具。打开本地 `.md` 文件，即可查看排版后的标题、列表、表格、代码和 Mermaid 图表；需要修改时，也可以直接编辑并实时预览。
 
-[下载 v1.0.7](https://github.com/JLS-superme/markdown-reader/releases/tag/v1.0.7) · [版本记录](CHANGELOG.md) · [反馈问题](https://github.com/JLS-superme/markdown-reader/issues)
+[下载 v1.0.8](https://github.com/JLS-superme/markdown-reader/releases/tag/v1.0.8) · [版本记录](CHANGELOG.md) · [反馈问题](https://github.com/JLS-superme/markdown-reader/issues)
 
 ![Markdown 阅读编辑器界面](docs/screenshots/overview.png)
 
@@ -21,11 +21,11 @@ AI 正在生成越来越多的 Markdown 文档：方案、学习笔记、操作�
 | 功能 | 解决什么问题 |
 | --- | --- |
 | 实时预览 | 左侧编辑，右侧立即看到排版效果；也支持只阅读或只编辑 |
-| 多窗口阅读 | 从资源管理器打开另一份 Markdown，会新建窗口，方便并排比较，不覆盖正在编辑的内容 |
+| 多窗口阅读 | 不同 Markdown 文档使用独立窗口，方便并排比较；重复打开同一文件会激活已有窗口，并保留未保存内容 |
 | Mermaid 图表 | 支持反引号和波浪号代码围栏，流程图采用灰白配色与直角连线，适合阅读 AI 生成的结构图和流程图 |
 | 长文档导航 | 标题目录、同步滚动、预览缩放和全屏，方便阅读较长的说明文档 |
 | 常用编辑工具 | 标题、列表、表格、链接、图片、删除线、查找替换，以及一键格式修复 |
-| 本地文档跳转 | 按住 Ctrl 单击本地 Markdown 链接，可在新窗口打开关联文档 |
+| 本地文档跳转 | 按住 Ctrl 单击本地 Markdown 链接，可打开关联文档；已打开的文档直接切换到原窗口 |
 | 多种导出格式 | 可导出 Markdown、HTML、PDF、Word、PNG、JPEG 和 WebP；排版导出正文默认宋体、小四（12pt） |
 | 保存保护 | 关闭含有未保存修改的窗口时，会提示保存，减少误关造成的内容丢失 |
 | 无需 AI 登录 | 阅读、编辑和导出本地 Markdown 不需要 AI 账号或 API Key |
@@ -34,12 +34,12 @@ AI 正在生成越来越多的 Markdown 文档：方案、学习笔记、操作�
 
 当前提供 **Windows x64** 版本：
 
-- [安装版：Markdown-Editor-Setup-1.0.7.exe](https://github.com/JLS-superme/markdown-reader/releases/download/v1.0.7/Markdown-Editor-Setup-1.0.7.exe)：可选择安装目录，创建桌面和开始菜单快捷方式。
-- [免安装版：Markdown-Editor-1.0.7.exe](https://github.com/JLS-superme/markdown-reader/releases/download/v1.0.7/Markdown-Editor-1.0.7.exe)：适合直接运行、随手阅读。
+- [安装版：Markdown-Editor-Setup-1.0.8.exe](https://github.com/JLS-superme/markdown-reader/releases/download/v1.0.8/Markdown-Editor-Setup-1.0.8.exe)：可选择安装目录，创建桌面和开始菜单快捷方式。
+- [免安装版：Markdown-Editor-1.0.8.exe](https://github.com/JLS-superme/markdown-reader/releases/download/v1.0.8/Markdown-Editor-1.0.8.exe)：适合直接运行、随手阅读。
 
 1. 启动软件，将 Markdown 文件拖入窗口，或点击导入按钮。
 2. 在预览区阅读文档，必要时切换到编辑与预览并排模式。
-3. 想比较两份文档时，再从资源管理器打开另一份 Markdown，即可使用两个窗口。
+3. 想比较两份文档时，再从资源管理器打开另一份 Markdown，即可使用两个窗口。重复打开已经打开的文件时，会恢复并激活原窗口。
 4. 需要分享文档时，点击导出并选择格式。
 
 安装版会注册 `.md` / `.markdown` 文件关联。如果 Windows 仍使用其他程序打开，可以在“打开方式”中选择本程序。

@@ -1,6 +1,6 @@
 {
   "name": "markdown-editor-desktop",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "面向 AI 文档时代的 Windows Markdown 阅读与编辑工具，支持实时预览、Mermaid、多窗口和导出。",
   "author": "JLS-superme",
   "private": true,
